@@ -1,0 +1,47 @@
+import { NextResponse } from 'next/server'
+import { getServiceClient } from '@/lib/supabase'
+import { apiError } from '@/lib/apiError'
+
+const supabase = getServiceClient('cron/pool-reset')
+
+export async function GET(req: Request) {
+
+  const authHeader = req.headers.get('authorization')
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  try {
+
+    const { data: resetData, error: resetErr } = await supabase
+      .from('phone_numbers')
+      .update({ daily_call_count: 0 })
+      .neq('status', 'released')
+      .select('id')
+
+    if (resetErr) throw resetErr
+
+    const { data: revivedData, error: reviveErr } = await supabase
+      .from('phone_numbers')
+      .update({ status: 'active' })
+      .eq('status', 'resting')
+      .select('id')
+
+    if (reviveErr) throw reviveErr
+
+    const result = {
+      success: true,
+      reset_count: resetData?.length ?? 0,
+      revived_count: revivedData?.length ?? 0,
+      timestamp: new Date().toISOString(),
+    }
+    console.log('[cron/pool-reset]', result)
+
+    return NextResponse.json(result)
+  } catch (err: any) {
+    console.error('[cron/pool-reset] error:', err)
+    return apiError(err, { route: 'cron/pool-reset' })
+  }
+}
+
+export const POST = GET

@@ -1,0 +1,76 @@
+
+
+
+
+
+
+
+
+
+
+import { NextRequest, NextResponse } from 'next/server'
+import { requireAuth, exchangeCodeForTokens, upsertTokens, GmailAuthError } from '@/lib/gmail'
+
+export const runtime = 'nodejs'
+
+function bounceBack(status: 'connected' | 'error' | 'denied', detail?: string) {
+  const url = new URL('/dashboard/admin/desktop', process.env.NEXT_PUBLIC_APP_URL!)
+  url.searchParams.set('gmail', status)
+  if (detail) url.searchParams.set('detail', detail.slice(0, 200))
+  return NextResponse.redirect(url.toString(), 302)
+}
+
+export async function GET(req: NextRequest) {
+  const url = req.nextUrl
+  const code = url.searchParams.get('code')
+  const state = url.searchParams.get('state')
+  const error = url.searchParams.get('error')
+
+  
+  if (error) {
+    return bounceBack('denied', error)
+  }
+
+  if (!code || !state) {
+    return bounceBack('error', 'missing_code_or_state')
+  }
+
+  
+  const cookieState = req.cookies.get('gmail_oauth_state')?.value
+  if (!cookieState || cookieState !== state) {
+    return bounceBack('error', 'state_mismatch')
+  }
+
+  try {
+    const clerkId = await requireAuth()
+
+    
+    
+    const expectedPrefix = `${clerkId}.`
+    if (!state.startsWith(expectedPrefix)) {
+      return bounceBack('error', 'state_user_mismatch')
+    }
+
+    const tokens = await exchangeCodeForTokens(code)
+    await upsertTokens({
+      clerkId,
+      email: tokens.email,
+      accessToken: tokens.accessToken,
+      refreshToken: tokens.refreshToken,
+      expiresInSec: tokens.expiresInSec,
+      scopes: tokens.scopes,
+    })
+
+    const res = bounceBack('connected')
+    
+    res.cookies.delete('gmail_oauth_state')
+    return res
+  } catch (err) {
+    if (err instanceof GmailAuthError && err.reason === 'not_signed_in') {
+      return bounceBack('error', 'not_signed_in')
+    }
+    console.error('[gmail/callback] error', err)
+    const detail = err instanceof Error ? err.message : 'unknown'
+    return bounceBack('error', detail)
+  }
+}

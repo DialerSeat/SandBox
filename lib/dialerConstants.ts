@@ -1,0 +1,52 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+export const HARD_LINE_CAP = 5
+
+
+
+export const ABANDON_DEGRADE_PCT = 2.5
+
+
+export const ABANDON_RECOVER_PCT = 2.0
+
+
+export const ABANDON_YIELD_PCT = 2.8
+
+
+
+
+
+export const IN_FLIGHT_WINDOW_MS = 90_000
+
+
+
+
+export const STALE_HEARTBEAT_MS = 15_000
+export const STALE_HEARTBEAT_SECONDS = STALE_HEARTBEAT_MS / 1000
+
+
+export const ABANDON_WINDOW_DAYS = 30
+export const ABANDON_WINDOW_MS = ABANDON_WINDOW_DAYS * 24 * 60 * 60 * 1000
+
+
+export const ABANDON_DEGRADE_FRACTION = ABANDON_DEGRADE_PCT / 100
+export const ABANDON_RECOVER_FRACTION = ABANDON_RECOVER_PCT / 100
+export const ABANDON_YIELD_FRACTION = ABANDON_YIELD_PCT / 100

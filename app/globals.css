@@ -1,0 +1,170 @@
+@import url('https://fonts.cdnfonts.com/css/futura-pt');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+
+  --brand-primary: #4a9eff;
+  --brand-sidebar-bg: #111118;
+  --brand-header-bg: #1a1a2e;
+  --brand-page-bg: #f0f1f4;
+
+  --brand-on-primary: #ffffff;
+  --brand-primary-hover: color-mix(in srgb, var(--brand-primary) 88%, black);
+  --brand-primary-soft: color-mix(in srgb, var(--brand-primary) 12%, transparent);
+
+  --brand-on-sidebar: #ffffff;
+  --brand-on-sidebar-muted: rgba(255, 255, 255, 0.55);
+  --brand-sidebar-active-bg: rgba(255, 255, 255, 0.08);
+  --brand-sidebar-hover-bg: rgba(255, 255, 255, 0.04);
+
+  --brand-on-header: #ffffff;
+  --brand-on-header-muted: rgba(255, 255, 255, 0.55);
+  --brand-header-top-accent: var(--brand-primary);
+
+  --brand-on-page-bg: #1a1c24;
+  --brand-card-surface: #e2e4ea;
+  --brand-card-border: #c4c8d0;
+  --brand-muted-text: #5a5e6a;
+
+  --brand-secondary: #2a6eff;
+  --brand-surface: #111118;
+  --brand-bg: #0a0a0f;
+  --brand-text: #f0f0f5;
+
+  --background: var(--brand-bg);
+  --surface: var(--brand-surface);
+  --surface-2: color-mix(in srgb, var(--brand-surface) 92%, var(--brand-text));
+  --border: color-mix(in srgb, var(--brand-text) 15%, transparent);
+  --text-primary: var(--brand-text);
+  --text-secondary: #8888aa;
+  --text-muted: color-mix(in srgb, var(--brand-text) 45%, transparent);
+  --accent-blue: var(--brand-primary);
+  --accent-silver: #c0c0d0;
+  --chrome: linear-gradient(135deg, #2a2a3a 0%, #1a1a24 50%, #2a2a3a 100%);
+  --divider: color-mix(in srgb, var(--brand-text) 10%, transparent);
+
+  --color-error: #ff6464;
+  --color-error-bg: rgba(138, 26, 26, 0.18);
+  --color-error-border: #8a1a1a;
+
+  --color-success: #32ff7e;
+  --color-success-bg: rgba(26, 106, 26, 0.18);
+  --color-success-border: #1a6a1a;
+
+  --color-warning: #ffaa3e;
+  --color-warning-bg: rgba(138, 106, 26, 0.18);
+  --color-warning-border: #8a6a1a;
+
+  --font-futura: 'Futura PT', 'Futura', sans-serif;
+  --font-mono: 'SF Mono', Monaco, Consolas, 'Liberation Mono', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: 'Futura PT', 'Futura', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (max-width: 768px) {
+  input,
+  select,
+  textarea,
+  input[type='text'],
+  input[type='email'],
+  input[type='password'],
+  input[type='tel'],
+  input[type='number'],
+  input[type='search'],
+  input[type='url'] {
+    font-size: 16px !important;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-blue);
+}
+a,
+button,
+label,
+input,
+select,
+textarea,
+[role='button'] {
+  touch-action: manipulation;
+}
+
+a,
+button,
+label,
+[role='button'] {
+  -webkit-touch-callout: none;
+}
+
+button,
+label,
+[role='button'] {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* ── Instant mobile tap feedback ──────────────────────────────────────────
+   Desktop already feels instant (mouse :hover + :active fire immediately).
+   On touch devices, buttons must visually respond the moment a finger
+   lands — not when a click handler resolves, not after a loading state
+   clears. This runs purely in CSS so the press animation always fires on
+   first touch, even if the JS thread is busy or a request is in flight. */
+a,
+button,
+[role='button'],
+input[type='submit'],
+input[type='button'] {
+  -webkit-tap-highlight-color: transparent;
+  tap-highlight-color: transparent;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  a,
+  button,
+  [role='button'],
+  input[type='submit'],
+  input[type='button'] {
+    transition: opacity 0.05s ease-out !important;
+  }
+
+  /* Opacity-only — never transform/scale. Scale on a wide, left-aligned
+     row (e.g. a full-width sidebar link) shifts around the element's
+     center, which visibly drags the text sideways on tap. Opacity has
+     zero geometry impact, so it's always safe regardless of element
+     shape, and still reads as an instant, confident press. */
+  a:active,
+  button:active:not(:disabled),
+  [role='button']:active,
+  input[type='submit']:active,
+  input[type='button']:active {
+    opacity: 0.6;
+  }
+}
+
