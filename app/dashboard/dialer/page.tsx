@@ -622,14 +622,25 @@ function DialerPageInner() {
         if (!sipUsername || !sipPassword || !sipDomain) return
 
         const { UserAgent, Registerer, SessionState } = await import('sip.js')
+        // SIP URI identity stays port-free — sip:user@domain is the correct
+        // standard SIP URI format, this is not a network address.
         const uri = UserAgent.makeURI(`sip:${sipUsername}@${sipDomain}`)
         if (!uri) return
+
+        // TRANSPORT PORT — Telnyx requires port 7443 specifically for SIP
+        // over WebSocket (wss://sip.telnyx.com:7443), confirmed directly
+        // against Telnyx's own SIP reference docs. This is NOT the same as
+        // sipDomain (which correctly stays bare/port-free for the URI
+        // above) — baking a port into TELNYX_SIP_DOMAIN would be a
+        // confusing env var to maintain, so the port lives here in code
+        // instead, next to the one place that actually needs it.
+        const wssPort = '7443'
 
         const userAgent = new UserAgent({
           uri,
           authorizationUsername: sipUsername,
           authorizationPassword: sipPassword,
-          transportOptions: { server: `wss://${sipDomain}` },
+          transportOptions: { server: `wss://${sipDomain}:${wssPort}` },
           sessionDescriptionHandlerFactoryOptions: {
             // peerConnectionConfiguration.iceServers is THE audio-path fix.
             // Without STUN/TURN the browser can't find a reachable media path
